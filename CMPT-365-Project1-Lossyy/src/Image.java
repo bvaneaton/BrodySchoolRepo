@@ -1,3 +1,5 @@
+import java.util.Vector;
+
 
 public class Image {
 	/**
@@ -9,6 +11,8 @@ public class Image {
 	protected double[] U;
 	protected double[] V;
 	
+	protected Vector<Double> uSubSampled, vSubSampled;
+	
 	//Size of image
 	protected int verticalSize;
 	protected int horizontalSize;
@@ -19,6 +23,19 @@ public class Image {
 		this.V = V;
 		this.verticalSize = verticalSize;
 		this.horizontalSize = horizontalSize;		
+	}
+	
+	public void setChromaSubSampled(Vector<Double> uSubSampled, Vector<Double> vSubSampled){
+		this.uSubSampled = uSubSampled;
+		this.vSubSampled = vSubSampled;
+	}
+	
+	public double getSubUat(int x, int y){
+		return (uSubSampled.get(x * 8 + y));
+	}
+	
+	public double getSubVat(int x, int y){
+		return (vSubSampled.get(x * 8 + y));
 	}
 	
 	//Getters

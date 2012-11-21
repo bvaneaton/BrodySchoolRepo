@@ -19,15 +19,21 @@ public class Encoder {
 	private double[] yCompressionChannel, uCompressionChannel, vCompressionChannel;
 	
 	//Huffman coded tables
-	private String[] yEntropyCodedChannel, uEntropyCodedChannel, vEntropyCodedChannel;
+	private int[] yEntropyCodedChannel, uEntropyCodedChannel, vEntropyCodedChannel;
 	
 	//Huffman coded tables after run-length encoding.
-	private byte[] yRunLengthCodedChannel, uRunLengthCodedChannel, vRunLengthCodedChannel;
+	private Vector<Integer> yRunLengthCodedChannel = new Vector<Integer>();
+	private Vector<Integer> uRunLengthCodedChannel = new Vector<Integer>();
+	private Vector<Integer> vRunLengthCodedChannel = new Vector<Integer>();
+	
+	//Chroma channels with sub sampling 	
+	private Vector<Double> uSubChannel = new Vector<Double>();
+	private Vector<Double> vSubChannel = new Vector<Double>();
 	
 	//codeTable for Y, U and V
-	SortedMap<Double, String> codeTableY = new TreeMap<Double, String>();
-	SortedMap<Double, String> codeTableU = new TreeMap<Double, String>();
-	SortedMap<Double, String> codeTableV = new TreeMap<Double, String>();
+	SortedMap<Double, Integer> codeTableY = new TreeMap<Double, Integer>();
+	SortedMap<Double, Integer> codeTableU = new TreeMap<Double, Integer>();
+	SortedMap<Double, Integer> codeTableV = new TreeMap<Double, Integer>();
 	
 	private int[] lumaQuantTable = {11, 11, 12, 15, 20, 27, 36, 47,
 		11, 12, 15, 20, 27, 36, 47, 93,
@@ -53,28 +59,28 @@ public class Encoder {
 	
 	public void encode(byte[] image, int horizontalPixel, int verticalPixel){				
 		yCompressionChannel = new double[horizontalPixel * verticalPixel];
-		uCompressionChannel = new double[horizontalPixel * verticalPixel];
-		vCompressionChannel = new double[horizontalPixel * verticalPixel];
+		uCompressionChannel = new double[(horizontalPixel / 2) * (verticalPixel / 2)];
+		vCompressionChannel = new double[(horizontalPixel / 2) * (verticalPixel / 2)];
 
-		yEntropyCodedChannel = new String[horizontalPixel * verticalPixel];
-		uEntropyCodedChannel = new String[horizontalPixel * verticalPixel];
-		vEntropyCodedChannel = new String[horizontalPixel * verticalPixel];
-		
-		yRunLengthCodedChannel = new byte[horizontalPixel * verticalPixel];
-		uRunLengthCodedChannel = new byte[horizontalPixel * verticalPixel];
-		vRunLengthCodedChannel = new byte[horizontalPixel * verticalPixel];
+		yEntropyCodedChannel = new int[horizontalPixel * verticalPixel];
+		uEntropyCodedChannel = new int[(horizontalPixel / 2) * (verticalPixel / 2)];
+		vEntropyCodedChannel = new int[(horizontalPixel / 2) * (verticalPixel / 2)];
 		
 		convertRGBtoYUV(image, horizontalPixel, verticalPixel);
 	    
 	    Image convertedImage = new Image(yChannel, uChannel , vChannel, verticalPixel, horizontalPixel);
 	    chromaSubSample(convertedImage);
+	    setImageChromaSubs(convertedImage, uSubChannel, vSubChannel);
 	    convertAndTransformBlocks(convertedImage);	  
 	    entropyCodeChannels(convertedImage);
 	}
 	
+	//set chroma sub samples 4:2:0 for the image
+	private void setImageChromaSubs(Image convertedImage, Vector<Double> uSubChannel, Vector<Double> vSubChannel){
+		convertedImage.setChromaSubSampled(uSubChannel, vSubChannel);
+	}
+	
 	private void chromaSubSample(Image convertedImage){
-		Vector<Double> uSubChannel = new Vector<Double>();
-		Vector<Double> vSubChannel = new Vector<Double>();
 		int columnSkip = 0;
 		int evenSkip = 0;
 		int oddSkip = 1;
@@ -128,7 +134,9 @@ public class Encoder {
 		entropyCodeChannels(convertedImage, vCompressionChannel, codeTableV, vEntropyCodedChannel);
 		System.out.print("");
 		runLengthEncodeChannels(yEntropyCodedChannel, yRunLengthCodedChannel);
-		/*try {
+		runLengthEncodeChannels(uEntropyCodedChannel, uRunLengthCodedChannel);
+		runLengthEncodeChannels(vEntropyCodedChannel, vRunLengthCodedChannel);
+		try {
 	        FileOutputStream fos = new FileOutputStream("test.IM3");
 	        Writer out = new OutputStreamWriter(fos, "UTF8");
 	        for (int i = 0; i < yEntropyCodedChannel.length; i++){
@@ -137,27 +145,42 @@ public class Encoder {
 	        for (int i = 0; i < uEntropyCodedChannel.length; i++){
 	        	out.write(uEntropyCodedChannel[i]);
 	        }
-	        for (int i = 0; i < uEntropyCodedChannel.length; i++){
+	        for (int i = 0; i < vEntropyCodedChannel.length; i++){
 	        	out.write(vEntropyCodedChannel[i]);
 	        }
 	        out.close();
 	    } 
 	    catch (IOException e) {
 	        e.printStackTrace();
-	    }*/
+	    }
 	}
 	
-	private void runLengthEncodeChannels(String[] entropyCodedChannel, byte[] runLengthCodedChannel){
-		runLengthCodedChannel = entropyCodedChannel[0].getBytes();
+	private void runLengthEncodeChannels(int[] entropyCodedChannel, Vector<Integer> runLengthCodedChannel){
+		int counter = 0;		
+		while (counter < entropyCodedChannel.length){
+			int encodeCounter = 1;
+			while((counter < entropyCodedChannel.length - 1) && entropyCodedChannel[counter] == entropyCodedChannel[counter + 1]){
+				encodeCounter++;
+				counter++;
+			}
+			runLengthCodedChannel.add(encodeCounter);
+			runLengthCodedChannel.add(entropyCodedChannel[counter]);
+			counter++;
+		}
 	}
 
 	private void entropyCodeChannels(Image convertedImage,
-			double[] compressionChannel, SortedMap<Double, String> codeTable, 
-			String[] entropyCodedChannel) {
+			double[] compressionChannel, SortedMap<Double, Integer> codeTable, 
+			int[] entropyCodedChannel) {
 		
 		SortedMap<Double, Integer> probabiliyTable = new TreeMap<Double, Integer>();
 		//Create the probability table to create our tree with
-		createProbabilityTable(convertedImage, probabiliyTable, compressionChannel);
+		if (compressionChannel.length > (convertedImage.getHorizontalSize() * convertedImage.getVerticalSize()) / 4){
+			createProbabilityTableLuma(convertedImage, probabiliyTable, compressionChannel);
+		} 
+		else {
+			createProbabilityTableChroma(convertedImage, probabiliyTable, compressionChannel);
+		}
 		
 		Vector<Node> dataNodes = new Vector<Node>();
 		int nodecounter = 0;
@@ -174,33 +197,34 @@ public class Encoder {
 		Node huffmanTree = dataNodes.get(0);
 		
 		//create the codeTable
-		createCodeTable(huffmanTree, "", codeTable);	
+		createCodeTable(huffmanTree, 0, codeTable);	
 		convertValuesIntoCodes(codeTable, compressionChannel, entropyCodedChannel);
 	}
 	
-	private void convertValuesIntoCodes(SortedMap<Double, String> codeTable,
-			double[] compresionChannel, String[] entropyCodedChannel){
+	private void convertValuesIntoCodes(SortedMap<Double, Integer> codeTable,
+			double[] compresionChannel, int[] entropyCodedChannel){
 		for(int i = 0; i < compresionChannel.length; i++){
 			entropyCodedChannel[i] = codeTable.get(compresionChannel[i]);
 		}
 	}
 	
-	private void createCodeTable(Node huffmanTree, String code, SortedMap<Double, String> codeTable){
+	private void createCodeTable(Node huffmanTree, int code, SortedMap<Double, Integer> codeTable){
         if( huffmanTree.getLeft() != null ){
         	 if (!(huffmanTree.getValue() == INTERNODEVALUE)){
         		 this.createCodeTable(huffmanTree.getLeft(), code, codeTable);
              } 
         	 else{
-        		 this.createCodeTable(huffmanTree.getLeft(), code + '0', codeTable);
+        		 this.createCodeTable(huffmanTree.getLeft(), code << 1, codeTable);
         	 }
-        }   
+        } 
         
         if( huffmanTree.getRight() != null ){
         	if (!(huffmanTree.getValue() == INTERNODEVALUE)){
         		this.createCodeTable(huffmanTree.getRight(), code, codeTable);
             }  
         	else{
-        		this.createCodeTable(huffmanTree.getRight(), code + '1', codeTable);
+        		code = code << 1;
+        		this.createCodeTable(huffmanTree.getRight(), code + 1, codeTable);
        	 	}
         }
         
@@ -209,11 +233,31 @@ public class Encoder {
         }
     }	
 
-	private void createProbabilityTable(Image convertedImage, 
+	private void createProbabilityTableLuma(Image convertedImage, 
 			SortedMap<Double, Integer> probabiliyTable, double[] compressionChannel) {
+		
 		for (int i = 0; i < convertedImage.getVerticalSize(); i++){
 			for (int j = 0; j < convertedImage.getHorizontalSize(); j++){
-				double value = (compressionChannel[(i * convertedImage.getVerticalSize() + j)]);
+				double value = (compressionChannel[(i * convertedImage.getHorizontalSize() + j)]);
+				if (probabiliyTable.containsKey(value)){
+					int probValue = probabiliyTable.get(value);
+					probValue++;
+					probabiliyTable.remove(value);
+					probabiliyTable.put(value, probValue);	
+				}
+				else{					
+					probabiliyTable.put(value, 1);
+				}				
+			}
+		}
+	}
+	
+	private void createProbabilityTableChroma(Image convertedImage, 
+			SortedMap<Double, Integer> probabiliyTable, double[] compressionChannel) {
+		
+		for (int i = 0; i < (convertedImage.getVerticalSize() / 2); i++){
+			for (int j = 0; j < (convertedImage.getHorizontalSize() / 2); j++){
+				double value = (compressionChannel[(i * (convertedImage.getHorizontalSize() /2) + j)]);
 				if (probabiliyTable.containsKey(value)){
 					int probValue = probabiliyTable.get(value);
 					probValue++;
@@ -315,7 +359,7 @@ public class Encoder {
 		double[] tempUDTValueBlock = new double[64];
 		double[] uDCTBlock = new double[64];
 		
-		while ((dctICount * 8 + dctJCount) <= (convertedImage.getHorizontalSize() * convertedImage.getVerticalSize()) - 1){
+		while ((dctICount * 8 + dctJCount) <= ((convertedImage.getHorizontalSize() * convertedImage.getVerticalSize()) / 4) - 1){
 			for (int i = 0; i < 8; i++){
 				if (m > 7){
 					m = 0;
@@ -323,10 +367,10 @@ public class Encoder {
 				for (int j = 0; j < 8; j++){
 					//weird case for 248 x 200 image causing crashing, by-passed the while loops check, so this is here to
 					//prevent the issue, it's sloppy but a quick fix, TODO: fix this.
-					if (((dctICount * 8 + dctJCount) >= ((convertedImage.getHorizontalSize() * convertedImage.getVerticalSize()) - 1))){
+					if (((dctICount * 8 + dctJCount) >= (((convertedImage.getHorizontalSize() * convertedImage.getVerticalSize()) / 4) - 1))){
 						break;
 					}
-					uDCTBlock[m * 8 + n] = convertedImage.getUAt(dctICount, dctJCount);
+					uDCTBlock[m * 8 + n] = convertedImage.getSubUat(dctICount, dctJCount);
 					dctJCount++;
 					n++;
 				}
@@ -348,7 +392,7 @@ public class Encoder {
 		double[] tempVDTValueBlock = new double[64];
 		double[] vDCTBlock = new double[64];
 		
-		while ((dctICount * 8 + dctJCount) <= (convertedImage.getHorizontalSize() * convertedImage.getVerticalSize()) - 1){
+		while ((dctICount * 8 + dctJCount) <= ((convertedImage.getHorizontalSize() * convertedImage.getVerticalSize()) / 4) - 1){
 			for (int i = 0; i < 8; i++){
 				if (m > 7){
 					m = 0;
@@ -356,10 +400,10 @@ public class Encoder {
 				for (int j = 0; j < 8; j++){
 					//weird case for 248 x 200 image causing crashing, by-passed the while loops check, so this is here to
 					//prevent the issue, it's sloppy but a quick fix, TODO: fix this.
-					if (((dctICount * 8 + dctJCount) >= ((convertedImage.getHorizontalSize() * convertedImage.getVerticalSize()) - 1))){
+					if (((dctICount * 8 + dctJCount) >= (((convertedImage.getHorizontalSize() * convertedImage.getVerticalSize()) / 4) - 1))){
 						break;
 					}
-					vDCTBlock[m * 8 + n] = convertedImage.getVAt(dctICount, dctJCount);
+					vDCTBlock[m * 8 + n] = convertedImage.getSubVat(dctICount, dctJCount);
 					dctJCount++;
 					n++;
 				}
