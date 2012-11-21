@@ -48,6 +48,7 @@ public class Encoder {
 			279, 559, 1119, 2239, 4479, 8959, 17919, 35839};
 	
 	public Encoder(){
+		//made a change
 	}
 	
 	public void encode(byte[] image, int horizontalPixel, int verticalPixel){				
