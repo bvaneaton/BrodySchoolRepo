@@ -67,8 +67,29 @@ public class Encoder {
 		convertRGBtoYUV(image, horizontalPixel, verticalPixel);
 	    
 	    Image convertedImage = new Image(yChannel, uChannel , vChannel, verticalPixel, horizontalPixel);
+	    chromaSubSample(convertedImage);
 	    convertAndTransformBlocks(convertedImage);	  
 	    entropyCodeChannels(convertedImage);
+	}
+	
+	private void chromaSubSample(Image convertedImage){
+		Vector<Double> uSubChannel = new Vector<Double>();
+		Vector<Double> vSubChannel = new Vector<Double>();
+		int columnSkip = 0;
+		int evenSkip = 0;
+		int oddSkip = 1;
+		for (int i = 0; i < (convertedImage.getVerticalSize() / 2); i++){
+			for (int j = 0; j < (convertedImage.getHorizontalSize() / 2); j++){
+				if (!(i == 0)){
+					evenSkip = 1;
+				}
+				if (!(j == 0)){
+					columnSkip++;
+				}
+				uSubChannel.add(uChannel[(((i + evenSkip ) * 8) + (j + columnSkip))]);
+				vSubChannel.add(vChannel[((i + oddSkip) * 8) + (j + columnSkip)]);
+			}
+		}
 	}
 
 	private void convertRGBtoYUV(byte[] image, int horizontalPixel,
