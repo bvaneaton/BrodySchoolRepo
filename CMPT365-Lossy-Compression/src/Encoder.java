@@ -153,6 +153,7 @@ public class Encoder {
 	    catch (IOException e) {
 	        e.printStackTrace();
 	    }
+		//testing change
 	}
 	
 	private void runLengthEncodeChannels(int[] entropyCodedChannel, Vector<Integer> runLengthCodedChannel){
