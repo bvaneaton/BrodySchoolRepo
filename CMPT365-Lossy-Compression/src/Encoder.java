@@ -10,7 +10,7 @@ import java.util.Vector;
 @SuppressWarnings("unused")
 public class Encoder {
 	//static final
-	private static final int INITIALOFFSET = 0;
+	private static final int INITIALOFFSET = 12;
 	private static final int INTERNODEVALUE = -6666;
 	
 	//channels
@@ -20,6 +20,15 @@ public class Encoder {
 	
 	//Huffman coded tables
 	private int[] yEntropyCodedChannel, uEntropyCodedChannel, vEntropyCodedChannel;
+	
+	double[] test = {255, 255, 255, 255, 255, 255, 255, 255,
+			255, 255, 255, 255, 255, 255, 255, 255,
+			255, 255, 255, 255, 255, 255, 255, 255,
+			255, 255, 255, 255, 255, 255, 255, 255,
+			255, 255, 255, 255, 255, 255, 255, 255,
+			255, 255, 255, 255, 255, 255, 255, 255,
+			255, 255, 255, 255, 255, 255, 255, 255,
+			255, 255, 255, 255, 255, 255, 255, 255};
 	
 	//Huffman coded tables after run-length encoding.
 	private Vector<Integer> yRunLengthCodedChannel = new Vector<Integer>();
@@ -68,11 +77,13 @@ public class Encoder {
 		
 		convertRGBtoYUV(image, horizontalPixel, verticalPixel);
 	    
+		
+		double[] testing = transformWithDCT(test);
 	    Image convertedImage = new Image(yChannel, uChannel , vChannel, verticalPixel, horizontalPixel);
 	    chromaSubSample(convertedImage);
 	    setImageChromaSubs(convertedImage, uSubChannel, vSubChannel);
 	    convertAndTransformBlocks(convertedImage);	  
-	    entropyCodeChannels(convertedImage);
+	   // entropyCodeChannels(convertedImage);
 	    runLengthEncoding();
 	    saveCompressedFile(convertedImage);
 	}
@@ -136,9 +147,12 @@ public class Encoder {
 	}
 	
 	private void runLengthEncoding(){
-		runLengthEncodeChannels(yEntropyCodedChannel, yRunLengthCodedChannel);
+		runLengthEncodeChannels(yCompressionChannel, yRunLengthCodedChannel);
+		runLengthEncodeChannels(uCompressionChannel, uRunLengthCodedChannel);
+		runLengthEncodeChannels(vCompressionChannel, vRunLengthCodedChannel);
+		/*runLengthEncodeChannels(yEntropyCodedChannel, yRunLengthCodedChannel);
 		runLengthEncodeChannels(uEntropyCodedChannel, uRunLengthCodedChannel);
-		runLengthEncodeChannels(vEntropyCodedChannel, vRunLengthCodedChannel);	
+		runLengthEncodeChannels(vEntropyCodedChannel, vRunLengthCodedChannel);	*/
 	}
 
 	private void saveCompressedFile(Image convertedImage) {
@@ -146,12 +160,14 @@ public class Encoder {
 	        FileOutputStream fos = new FileOutputStream("test.IM3");
 	        Writer out = new OutputStreamWriter(fos, "UTF-16BE");
 	        //save the code tables
-	        out.write(INITIALOFFSET);
-	        out.write(codeTableY.size() + INITIALOFFSET);
-	        out.write(codeTableU.size() + codeTableY.size());
-	        out.write(codeTableV.size() + codeTableU.size() + codeTableY.size());
 	        out.write(uRunLengthCodedChannel.size());
 	        out.write(vRunLengthCodedChannel.size());
+	        out.write(convertedImage.getHorizontalSize());
+	        out.write(convertedImage.getVerticalSize());
+	        /*out.write(INITIALOFFSET);
+	        out.write(codeTableY.size());
+	        out.write(codeTableU.size());
+	        out.write(codeTableV.size());       
 	        
 	        for (double key : codeTableY.keySet()){
 	        	out.write(codeTableY.get(key));
@@ -164,19 +180,19 @@ public class Encoder {
 	        for (double key : codeTableV.keySet()){
 	        	out.write(codeTableV.get(key));
 	        	out.write((int)key);
-	        }
+	        }*/
 	        
-	        //save run-length coded channels of data	        
+	        //save run-length coded channels of data and shift the values up by 128.		        
 	        for (int i = 0; i < uRunLengthCodedChannel.size(); i++){
-	        	int byteValue = uRunLengthCodedChannel.get(i);
+	        	int byteValue = uRunLengthCodedChannel.get(i) + 128;
 	        	out.write(byteValue);
 	        }
 	        for (int i = 0; i < vRunLengthCodedChannel.size(); i++){
-	        	int byteValue = vRunLengthCodedChannel.get(i);
+	        	int byteValue = vRunLengthCodedChannel.get(i) + 128;
 	        	out.write(byteValue);
-	        }
+	        }	
 	        for (int i = 0; i < yRunLengthCodedChannel.size(); i++){
-	        	int byteValue = yRunLengthCodedChannel.get(i);
+	        	int byteValue = yRunLengthCodedChannel.get(i) + 128;
 	        	out.write(byteValue);
 	        }
 	        out.close();
@@ -186,7 +202,7 @@ public class Encoder {
 	    }
 	}
 	
-	private void runLengthEncodeChannels(int[] entropyCodedChannel, Vector<Integer> runLengthCodedChannel){
+	private void runLengthEncodeChannels(double[] entropyCodedChannel, Vector<Integer> runLengthCodedChannel){
 		int counter = 0;		
 		while (counter < entropyCodedChannel.length){
 			int encodeCounter = 1;
@@ -195,7 +211,7 @@ public class Encoder {
 				counter++;
 			}
 			runLengthCodedChannel.add(encodeCounter);
-			runLengthCodedChannel.add(entropyCodedChannel[counter]);
+			runLengthCodedChannel.add((int)entropyCodedChannel[counter]);
 			counter++;
 		}
 	}
@@ -228,7 +244,7 @@ public class Encoder {
 		Node huffmanTree = dataNodes.get(0);
 		
 		//create the codeTable
-		createCodeTable(huffmanTree, 0, codeTable);	
+		createCodeTable(huffmanTree, 1, codeTable);	
 		convertValuesIntoCodes(codeTable, compressionChannel, entropyCodedChannel);
 	}
 	
@@ -240,11 +256,11 @@ public class Encoder {
 	}
 	
 	private void createCodeTable(Node huffmanTree, int code, SortedMap<Double, Integer> codeTable){
-        if( huffmanTree.getLeft() != null ){
+        if( huffmanTree.getLeft() != null ){        	
         	 if (!(huffmanTree.getValue() == INTERNODEVALUE)){
         		 this.createCodeTable(huffmanTree.getLeft(), code, codeTable);
              } 
-        	 else{
+        	 else{        		 
         		 this.createCodeTable(huffmanTree.getLeft(), code << 1, codeTable);
         	 }
         } 
@@ -254,8 +270,7 @@ public class Encoder {
         		this.createCodeTable(huffmanTree.getRight(), code, codeTable);
             }  
         	else{
-        		code = code << 1;
-        		this.createCodeTable(huffmanTree.getRight(), code + 1, codeTable);
+        		this.createCodeTable(huffmanTree.getRight(),  (code << 1) | 1, codeTable);
        	 	}
         }
         
@@ -464,8 +479,7 @@ public class Encoder {
 			}
 			m++;
 			n = 0;
-		}
-				
+		}				
 	}
 	
 	private void addToUTable(double[] tempUDTValueBlock, double dctICount, double dctJCount){
@@ -525,45 +539,33 @@ public class Encoder {
 	
 	//DCT transform functions
 	private double[] transformWithDCT(double[] DCTBlock){
-		double[] tempDCTBlock = new double[64];
-		
-		double result = 0;
+		int i, j, u, v;
+		double[] out = new double[64];
+		  double s;
 
-		for(int u = 0; u < 8; u++) 
-		{
-			for(int v = 0; v < 8; v++)
-			{
-				result = 0; // reset summed results to 0
-				for(int i = 0; i < 8; i++)
-				{
-					for(int j = 0; j < 8; j++)
-					{
-						result = basisMatrixAndCalc(DCTBlock, result, u, v, i, j);
-					}
-				}
-				tempDCTBlock[u * 8 + v] = Math.round(result); //store the results
-			}
-		}		
-		return tempDCTBlock;
+		  for (i = 0; i < 8; i++)
+		    for (j = 0; j < 8; j++)
+		    {
+		      s = 0;
+
+		      for (u = 0; u < 8; u++)
+		        for (v = 0; v < 8; v++)
+		          s += DCTBlock[u * 8 + v] * Math.cos((2 * u + 1) * i * Math.PI / 16) *
+		        		  Math.cos((2 * v + 1) * j * Math.PI / 16) *
+		               ((i == 0) ? 1 / Math.sqrt(2) : 1) *
+		               ((j == 0) ? 1 / Math.sqrt(2) : 1);
+
+		      out[i * 8 + j] = Math.round(s / 4);
+		    }
+		  return out;
 	}
 
-	private double basisMatrixAndCalc(double[] DCTBlock, double result, int u, int v, int i, int j) {
-		double x = 1;
-		double y = 0;
-		if (i == 0)
-		{
-		    x = 1/Math.sqrt(2.0);
-		}
-		if (j == 0)
-		{
-		    y = 1/Math.sqrt(2.0);
-		}
-		
-		result = result + ( x * y *
-			Math.cos((( Math.PI * u ) / ( 2 * 8 )) * ( 2 * i + 1)) *
-			Math.cos((( Math.PI * v ) / ( 2 * 8 )) * ( 2 * j + 1 )) *
-			DCTBlock[i * 8 + j]);
-		return result;
+	private double basisMatrixAndCalc(double[] DCTBlock, double result, int i, int j, int u, int v) {
+		result += DCTBlock[u * 8 + v] * Math.cos((2 * u + 1) * i * Math.PI / 16) *
+				Math.cos((2 * v + 1) * j * Math.PI / 16) *
+				((i == 0) ? 1 / Math.sqrt(2) : 1) *
+				((j == 0) ? 1 / Math.sqrt(2) : 1);
+		return (result / 4);
 	}
 	
 	//Conversion methods for YUV and RGB

@@ -6,7 +6,7 @@ public class MainProgram {
 	  {  
 		 String fileName = "";
 		 Encoder encoder = new Encoder();
-		 Decoder decoder;
+		 Decoder decoder = new Decoder();
 		 byte[] byteArray;
 		 System.out.println("Input a file name: ");
 		 
@@ -51,6 +51,7 @@ public class MainProgram {
 	  	  byteArray = new byte[inputStream.available()];	  	  
 	  	  int read1 = inputStream.read(byteArray);	  	  
 	  	  inputStream.close();  
+	  	  decoder.decode(byteArray);	  	  
 	  	  
 	  	try
 	      {
