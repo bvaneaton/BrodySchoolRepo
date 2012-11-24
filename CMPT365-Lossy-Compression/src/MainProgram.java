@@ -1,10 +1,11 @@
 import java.io.*;
 
+@SuppressWarnings("unused")
 public class MainProgram {
 	public static void main(String args[]) throws Exception
 	  {  
 		 String fileName = "";
-		 Encoder encoder = new Encoder();;
+		 Encoder encoder = new Encoder();
 		 Decoder decoder;
 		 byte[] byteArray;
 		 System.out.println("Input a file name: ");
@@ -34,10 +35,27 @@ public class MainProgram {
   	      readImageData(byteArray, 0, horizontalPixel, verticalPixel);	    	     
 	      System.out.println("Encoding...");
 	      encoder.encode(byteArray, horizontalPixel, verticalPixel);
+	      
+	      System.out.println("Input a file name: ");		 
 	      try
 	      {
-	    	  br.readLine();
-	    	  System.exit(1);
+	    	  fileName = br.readLine();
+	    	  
+	      }
+	      catch(IOException ioe){
+	    	  System.out.println("Error");
+	          System.exit(1);
+	      }     
+	      
+		  InputStream inputStream = new FileInputStream(fileName);
+	  	  byteArray = new byte[inputStream.available()];	  	  
+	  	  int read1 = inputStream.read(byteArray);	  	  
+	  	  inputStream.close();  
+	  	  
+	  	try
+	      {
+	  		System.out.println("Decoding...");	
+	    	br.readLine();	    	   		 
 	      }
 	      catch(IOException ioe){
 	    	  System.out.println("Error");

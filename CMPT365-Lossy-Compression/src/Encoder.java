@@ -7,10 +7,10 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.Vector;
 
-
+@SuppressWarnings("unused")
 public class Encoder {
 	//static final
-	private static final int DCTSIZE = 8;
+	private static final int INITIALOFFSET = 0;
 	private static final int INTERNODEVALUE = -6666;
 	
 	//channels
@@ -73,6 +73,8 @@ public class Encoder {
 	    setImageChromaSubs(convertedImage, uSubChannel, vSubChannel);
 	    convertAndTransformBlocks(convertedImage);	  
 	    entropyCodeChannels(convertedImage);
+	    runLengthEncoding();
+	    saveCompressedFile(convertedImage);
 	}
 	
 	//set chroma sub samples 4:2:0 for the image
@@ -127,33 +129,61 @@ public class Encoder {
 	    }
 	}
 	
-	private void entropyCodeChannels(Image convertedImage){
-				
+	private void entropyCodeChannels(Image convertedImage){				
 		entropyCodeChannels(convertedImage, yCompressionChannel, codeTableY, yEntropyCodedChannel);
 		entropyCodeChannels(convertedImage, uCompressionChannel, codeTableU, uEntropyCodedChannel);
-		entropyCodeChannels(convertedImage, vCompressionChannel, codeTableV, vEntropyCodedChannel);
-		System.out.print("");
+		entropyCodeChannels(convertedImage, vCompressionChannel, codeTableV, vEntropyCodedChannel);			
+	}
+	
+	private void runLengthEncoding(){
 		runLengthEncodeChannels(yEntropyCodedChannel, yRunLengthCodedChannel);
 		runLengthEncodeChannels(uEntropyCodedChannel, uRunLengthCodedChannel);
-		runLengthEncodeChannels(vEntropyCodedChannel, vRunLengthCodedChannel);
-		try {
+		runLengthEncodeChannels(vEntropyCodedChannel, vRunLengthCodedChannel);	
+	}
+
+	private void saveCompressedFile(Image convertedImage) {
+		try {			
 	        FileOutputStream fos = new FileOutputStream("test.IM3");
-	        Writer out = new OutputStreamWriter(fos, "UTF8");
-	        for (int i = 0; i < yEntropyCodedChannel.length; i++){
-	        	out.write(yEntropyCodedChannel[i]);
+	        Writer out = new OutputStreamWriter(fos, "UTF-16BE");
+	        //save the code tables
+	        out.write(INITIALOFFSET);
+	        out.write(codeTableY.size() + INITIALOFFSET);
+	        out.write(codeTableU.size() + codeTableY.size());
+	        out.write(codeTableV.size() + codeTableU.size() + codeTableY.size());
+	        out.write(uRunLengthCodedChannel.size());
+	        out.write(vRunLengthCodedChannel.size());
+	        
+	        for (double key : codeTableY.keySet()){
+	        	out.write(codeTableY.get(key));
+	        	out.write((int)key);
 	        }
-	        for (int i = 0; i < uEntropyCodedChannel.length; i++){
-	        	out.write(uEntropyCodedChannel[i]);
+	        for (double key : codeTableU.keySet()){
+	        	out.write(codeTableU.get(key));
+	        	out.write((int)key);
+	        }	        
+	        for (double key : codeTableV.keySet()){
+	        	out.write(codeTableV.get(key));
+	        	out.write((int)key);
 	        }
-	        for (int i = 0; i < vEntropyCodedChannel.length; i++){
-	        	out.write(vEntropyCodedChannel[i]);
+	        
+	        //save run-length coded channels of data	        
+	        for (int i = 0; i < uRunLengthCodedChannel.size(); i++){
+	        	int byteValue = uRunLengthCodedChannel.get(i);
+	        	out.write(byteValue);
+	        }
+	        for (int i = 0; i < vRunLengthCodedChannel.size(); i++){
+	        	int byteValue = vRunLengthCodedChannel.get(i);
+	        	out.write(byteValue);
+	        }
+	        for (int i = 0; i < yRunLengthCodedChannel.size(); i++){
+	        	int byteValue = yRunLengthCodedChannel.get(i);
+	        	out.write(byteValue);
 	        }
 	        out.close();
 	    } 
 	    catch (IOException e) {
 	        e.printStackTrace();
 	    }
-		//testing change
 	}
 	
 	private void runLengthEncodeChannels(int[] entropyCodedChannel, Vector<Integer> runLengthCodedChannel){
