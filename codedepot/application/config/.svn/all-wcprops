@@ -1,0 +1,95 @@
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/CMPT470-1127-g-the-web-devs/!svn/ver/209/codedepot/application/config
+END
+database.php
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/CMPT470-1127-g-the-web-devs/!svn/ver/62/codedepot/application/config/database.php
+END
+index.html
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/CMPT470-1127-g-the-web-devs/!svn/ver/16/codedepot/application/config/index.html
+END
+mimes.php
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/CMPT470-1127-g-the-web-devs/!svn/ver/209/codedepot/application/config/mimes.php
+END
+doctypes.php
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/CMPT470-1127-g-the-web-devs/!svn/ver/16/codedepot/application/config/doctypes.php
+END
+user_agents.php
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/CMPT470-1127-g-the-web-devs/!svn/ver/16/codedepot/application/config/user_agents.php
+END
+config.php
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/CMPT470-1127-g-the-web-devs/!svn/ver/125/codedepot/application/config/config.php
+END
+smileys.php
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/CMPT470-1127-g-the-web-devs/!svn/ver/16/codedepot/application/config/smileys.php
+END
+profiler.php
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/CMPT470-1127-g-the-web-devs/!svn/ver/16/codedepot/application/config/profiler.php
+END
+routes.php
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/CMPT470-1127-g-the-web-devs/!svn/ver/19/codedepot/application/config/routes.php
+END
+migration.php
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/CMPT470-1127-g-the-web-devs/!svn/ver/16/codedepot/application/config/migration.php
+END
+constants.php
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/CMPT470-1127-g-the-web-devs/!svn/ver/16/codedepot/application/config/constants.php
+END
+hooks.php
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/CMPT470-1127-g-the-web-devs/!svn/ver/16/codedepot/application/config/hooks.php
+END
+foreign_chars.php
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/CMPT470-1127-g-the-web-devs/!svn/ver/16/codedepot/application/config/foreign_chars.php
+END
+form_validation.php
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/CMPT470-1127-g-the-web-devs/!svn/ver/188/codedepot/application/config/form_validation.php
+END
+autoload.php
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/CMPT470-1127-g-the-web-devs/!svn/ver/151/codedepot/application/config/autoload.php
+END

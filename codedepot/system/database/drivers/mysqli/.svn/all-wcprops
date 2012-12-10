@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/CMPT470-1127-g-the-web-devs/!svn/ver/16/codedepot/system/database/drivers/mysqli
+END
+index.html
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/CMPT470-1127-g-the-web-devs/!svn/ver/16/codedepot/system/database/drivers/mysqli/index.html
+END
+mysqli_forge.php
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/CMPT470-1127-g-the-web-devs/!svn/ver/16/codedepot/system/database/drivers/mysqli/mysqli_forge.php
+END
+mysqli_driver.php
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/CMPT470-1127-g-the-web-devs/!svn/ver/16/codedepot/system/database/drivers/mysqli/mysqli_driver.php
+END
+mysqli_utility.php
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/svn/CMPT470-1127-g-the-web-devs/!svn/ver/16/codedepot/system/database/drivers/mysqli/mysqli_utility.php
+END
+mysqli_result.php
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/CMPT470-1127-g-the-web-devs/!svn/ver/16/codedepot/system/database/drivers/mysqli/mysqli_result.php
+END

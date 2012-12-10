@@ -1,0 +1,14 @@
+fun int eat( bool f )
+if f <> true
+return 5
+else
+return 6
+fi
+nuf
+
+prog
+int e
+e = eat(true)
+
+#"e: " e#
+gorp

@@ -1,0 +1,99 @@
+.ui-inbox {
+	display:none;	
+	position:absolute;
+	top:30px;
+	right:0;
+	width:600px;
+	height:auto;
+	z-index:100;
+	background:#fff;
+	border:1px solid #333;
+}
+.ui-inbox .inbox-container {
+	padding:10px;
+}
+.ui-inbox p {
+	clear:both;	
+}
+.ui-inbox .inbox-container h2 {
+	font-size:18px;
+	height:18px;
+	color:#333;
+	margin-bottom:5px;
+	float:left;
+}
+.ui-inbox .compose-button-row {
+	float:right;
+	width:60%;
+	text-align:right;
+}
+.ui-inbox .compose-button-row a{
+	text-decoration:none;
+	font-weight:bold;
+}
+.ui-inbox .message-table {
+	width:100%;	
+}
+.ui-inbox .message-table th {
+	background:#bbb;
+	text-align:left;
+	padding:5px 2px 5px 10px;
+	font-weight:bold;
+	font-size:15px;
+}
+.ui-inbox .message-table tr {
+	border-bottom:1px solid #aaa;
+	background:#ccc;
+}
+.ui-inbox .message-table tr.unread {
+	font-weight:bold;
+	background:#fff;
+}
+.ui-inbox .message-table tr:hover {
+	cursor:pointer;
+	background:#eee;	
+}
+.ui-inbox .message-table div.inbox-field {
+	padding:5px;	
+	float:left;
+}
+.ui-inbox .message-table div.inbox-from {
+	width:29%;	
+}
+.ui-inbox .message-table div.inbox-subject {
+	width:39%;	
+}
+.ui-inbox .message-table div.inbox-date {
+	width:25%;	
+}
+.ui-inbox .message-table div.message-field {
+	display:none;
+	clear:both;
+	padding:10px;	
+}
+.ui-inbox .message-table .message-delete-link {
+	text-decoration:none;	
+}
+.ui-inbox .message-table .message-delete-link:hover {
+	text-decoration:underline;	
+}
+/*
+	Compose Message Box
+*/
+.ui-compose-widget {
+	width:100%;	
+	position:relative;
+}
+.ui-compose-widget input {
+	width:100%;	
+}
+.ui-compose-widget .compose-message {
+	height:70px;
+}
+.ui-compose-widget .close-compose {
+	position:absolute;
+	left:-26px;	
+	color:#900;
+	font-weight:bold;
+	font-size:16px;
+}

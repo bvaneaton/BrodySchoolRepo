@@ -1,0 +1,10 @@
+    # #
+    quarters = 6
+    dimes = 3
+    value = quarters * 25 + dimes * 10
+    
+    #"dimes: " dimes#
+    #"quarters: " quarters#
+    #"--------------"#
+    #"value is " value##    
+  

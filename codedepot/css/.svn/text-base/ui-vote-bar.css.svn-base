@@ -1,0 +1,44 @@
+/*
+	VoteBar
+*/
+.votebar-container {
+	
+}
+.votebar-container .vote-down {
+	float:right;
+}
+.votebar-container .vote-meter {
+	height:5px;	
+	width:100%;
+}
+.votebar-container .vote-meter .likes,
+.votebar-container .vote-meter .dislikes {
+	height:5px;	
+	width:50%;
+}
+.votebar-container .vote-meter .likes {
+	background:green;
+}
+.votebar-container .vote-meter .dislikes {
+	background:red;
+}
+/*
+	VoteButtons
+*/
+.ui-vote-buttons {
+	margin-top:5px;	
+}
+.ui-vote-buttons .button {
+	float:left;
+	border:1px solid #222;	
+	color:#fff;
+	padding:2px 5px;
+	margin-right:10px;
+	cursor:pointer;
+}
+.ui-vote-buttons .vote-up-button {
+	background:green;
+}
+.ui-vote-buttons .vote-down-button {
+	background:red;
+}

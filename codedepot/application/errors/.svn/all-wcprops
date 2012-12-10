@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/CMPT470-1127-g-the-web-devs/!svn/ver/16/codedepot/application/errors
+END
+index.html
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/CMPT470-1127-g-the-web-devs/!svn/ver/16/codedepot/application/errors/index.html
+END
+error_404.php
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/CMPT470-1127-g-the-web-devs/!svn/ver/16/codedepot/application/errors/error_404.php
+END
+error_php.php
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/CMPT470-1127-g-the-web-devs/!svn/ver/16/codedepot/application/errors/error_php.php
+END
+error_general.php
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/CMPT470-1127-g-the-web-devs/!svn/ver/16/codedepot/application/errors/error_general.php
+END
+error_db.php
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/CMPT470-1127-g-the-web-devs/!svn/ver/16/codedepot/application/errors/error_db.php
+END
